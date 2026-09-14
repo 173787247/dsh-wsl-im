@@ -1,0 +1,8 @@
+- insert:
+    - id: dsh-wsl-im
+      name: dsh-wsl-im
+      config:
+        timeoutMs: 60000
+        baseUrl: "http://127.0.0.1:8080"
+        apiKey: ""
+        defaultAgent: ""

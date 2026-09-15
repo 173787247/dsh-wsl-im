@@ -50,10 +50,13 @@ npm i @larksuiteoapi/node-sdk
 ## Install
 
 ```sh
+# latest tagged release
+dsh plugin --profile web add github:173787247/dsh-wsl-im#v0.2.0
+# or track default branch
 dsh plugin --profile web add github:173787247/dsh-wsl-im
-# or local:
-# dsh plugin --profile web add /mnt/c/Users/.../dsh-wsl-im
 ```
+
+**Awesome:** entry draft in [`docs/awesome-entry.yml`](./docs/awesome-entry.yml) — submit to [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) after the repo is ≥1 day old (CI gate).
 
 Source env (see `examples/dsh-wsl-im.env.example`), restart web, **new session**. Tool: `im_status`.
 

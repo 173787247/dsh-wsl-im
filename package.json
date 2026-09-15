@@ -1,7 +1,7 @@
 {
   "name": "dsh-wsl-im",
   "version": "0.2.0",
-  "description": "dsh IM bridge (Feishu / WeCom aibot / DingTalk Stream / QQ Gateway). Protocols referenced from OryxOS; runtime talks to dsh agents directly — not via OryxOS HTTP.",
+  "description": "DeepSeek Harness IM bridge for WSL: Feishu / WeCom aibot / DingTalk Stream / QQ Gateway into ctx.agents (plus im_status tool).",
   "license": "MIT",
   "repository": {
     "type": "git",

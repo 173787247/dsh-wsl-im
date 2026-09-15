@@ -1,0 +1,19 @@
+# Awesome dsh-plugin entry (draft — submit after repo is ≥1 day old)
+#
+# File to add in a PR to awesome-dsh-plugin:
+#   data/plugins/173787247__dsh-wsl-im.yml
+#
+# Do NOT submit until GitHub shows the repo created ≥24h earlier
+# (CI enforces this). Created ~2026-09-14T19:34Z.
+#
+# Also required before PR:
+#   gh repo edit 173787247/dsh-wsl-im --add-topic dsh-plugin --add-topic wsl
+#
+# See: https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md
+
+url: https://github.com/173787247/dsh-wsl-im
+name: 173787247/dsh-wsl-im
+category: wsl
+description:
+  en: 'Bridges Feishu, WeCom aibot, DingTalk Stream, and QQ Gateway chats into dsh agents over outbound long connections, with an im_status tool.'
+  zh: '通过出站长连接把飞书、企微智能机器人、钉钉 Stream、QQ 官方 Gateway 的会话桥进 dsh agent，并提供 im_status 工具。'

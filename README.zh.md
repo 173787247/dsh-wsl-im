@@ -21,8 +21,12 @@
 ## 安装
 
 ```sh
+dsh plugin --profile web add github:173787247/dsh-wsl-im#v0.2.0
+# 或跟踪默认分支
 dsh plugin --profile web add github:173787247/dsh-wsl-im
 ```
+
+**Awesome：** 条目草稿见 [`docs/awesome-entry.yml`](./docs/awesome-entry.yml)；仓库满 ≥1 天后再向 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 提 PR（CI 会卡年龄）。
 
 `source` 环境变量后 `restart-dsh-web.sh`，新开会话。可用工具 `im_status`。
 

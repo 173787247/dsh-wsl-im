@@ -18,6 +18,8 @@
 
 飞书还需在 profile 里安装 `@larksuiteoapi/node-sdk`。
 
+企微 WSS（`openws.work.weixin.qq.com`）在本机常需走 `HTTPS_PROXY`/`HTTP_PROXY`（`ws` 不吃 `NODE_USE_ENV_PROXY`）。同一 Bot 同时只能一条长连接——测 dsh 时请关掉 OryxOS/OpenClaw 上的同 Bot。
+
 ## 安装
 
 ```sh

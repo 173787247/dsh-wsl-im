@@ -1,6 +1,6 @@
 {
   "name": "dsh-wsl-im",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DeepSeek Harness IM bridge for WSL: Feishu / WeCom aibot / DingTalk Stream / QQ Gateway into ctx.agents (plus im_status tool).",
   "license": "MIT",
   "repository": {
@@ -13,8 +13,12 @@
   "homepage": "https://github.com/173787247/dsh-wsl-im#readme",
   "type": "module",
   "main": "index.js",
-  "engines": { "node": ">=18" },
-  "scripts": { "test": "node --test test/*.test.js" },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
   "files": [
     "index.js",
     "lib",
@@ -38,10 +42,15 @@
     "qq"
   ],
   "dependencies": {
+    "https-proxy-agent": "^7.0.6",
     "ws": "^8.18.3"
   },
   "optionalDependencies": {
     "@larksuiteoapi/node-sdk": "^1.55.0"
   },
-  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
 }

@@ -46,6 +46,11 @@ describe("extractors", () => {
   it("wecom text", () => {
     assert.equal(extractWecomText({ msgtype: "text", text: { content: "yo" } }), "yo");
   });
+  it("wecom media sniff jpeg", async () => {
+    const { sniffImageMediaType } = await import("../lib/wecom-media.js");
+    const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    assert.equal(sniffImageMediaType(jpeg), "image/jpeg");
+  });
   it("dingtalk text", () => {
     assert.equal(extractDingText({ text: { content: "ding" } }), "ding");
   });

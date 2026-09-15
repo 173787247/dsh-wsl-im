@@ -47,6 +47,10 @@ Enable with `DSH_IM_FEISHU=1` (etc.) or `adapters.*.enabled: true` in patch conf
 npm i @larksuiteoapi/node-sdk
 ```
 
+### WeCom proxy
+
+`openws.work.weixin.qq.com` often needs `HTTPS_PROXY`/`HTTP_PROXY`. The adapter uses `https-proxy-agent` (`ws` ignores `NODE_USE_ENV_PROXY`). One Bot = one live WS — disable the same Bot on OryxOS/OpenClaw while testing.
+
 ## Install
 
 ```sh

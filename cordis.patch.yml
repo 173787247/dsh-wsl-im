@@ -2,7 +2,31 @@
     - id: dsh-wsl-im
       name: dsh-wsl-im
       config:
-        timeoutMs: 60000
-        baseUrl: "http://127.0.0.1:8080"
-        apiKey: ""
-        defaultAgent: ""
+        enabled: true
+        adapters:
+          mock:
+            enabled: false
+            port: 18999
+          feishu:
+            enabled: false
+            appId: ""
+            appSecret: ""
+          wecom:
+            enabled: false
+            botId: ""
+            secret: ""
+          dingtalk:
+            enabled: false
+            clientId: ""
+            clientSecret: ""
+          qq:
+            enabled: false
+            appId: ""
+            appSecret: ""
+        agent:
+          cwd: ""
+          provider: ""
+          model: ""
+          maxMessageLength: 4000
+          idleTimeoutMs: 1800000
+          instructionPrefix: ""

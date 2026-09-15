@@ -1,6 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- **Breaking:** remove OryxOS HTTP tools (`oryx_*`). IM now bridges **directly to dsh agents**.
+- Adapters: Feishu WS, WeCom aibot WS, DingTalk Stream, QQ Gateway, mock HTTP.
+- Protocols documented against OryxOS channel modules (`docs/PROTOCOL.md`).
+- Tool: `im_status`.
+
 ## 0.1.0
 
-- Initial release: `oryx_health`, `oryx_im_list`, `oryx_im_status`, `oryx_notify_list`, `oryx_invoke`.
-- Talks to local OryxOS HTTP (`/api/v1/...`); does not embed Feishu/Telegram/etc. SDKs.
+- Initial mistaken design (OryxOS HTTP proxy). Superseded by 0.2.0.

@@ -1,7 +1,7 @@
 {
   "name": "dsh-wsl-im",
-  "version": "0.1.0",
-  "description": "DeepSeek Harness tools: bridge dsh ↔ local OryxOS IM channels (status, notify list, agent invoke).",
+  "version": "0.2.0",
+  "description": "dsh IM bridge (Feishu / WeCom aibot / DingTalk Stream / QQ Gateway). Protocols referenced from OryxOS; runtime talks to dsh agents directly — not via OryxOS HTTP.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,10 +14,11 @@
   "type": "module",
   "main": "index.js",
   "engines": { "node": ">=18" },
-  "scripts": { "test": "node --test test/im.test.js" },
+  "scripts": { "test": "node --test test/*.test.js" },
   "files": [
     "index.js",
     "lib",
+    "docs",
     "cordis.patch.yml",
     "README.md",
     "README.zh.md",
@@ -30,10 +31,17 @@
     "dsh-plugin",
     "deepseek-harness",
     "wsl",
-    "oryxos",
     "im",
     "feishu",
-    "telegram"
+    "wecom",
+    "dingtalk",
+    "qq"
   ],
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "optionalDependencies": {
+    "@larksuiteoapi/node-sdk": "^1.55.0"
+  },
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
 }

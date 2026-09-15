@@ -1,133 +1,85 @@
-import {
-  resolveOryxConfig,
-  publicConfigStatus,
-  ORYX_IM_TYPES,
-  health,
-  listChannels,
-  channelStatus,
-  listNotifyChannels,
-  invokeAgent,
-} from "./lib/oryx.js";
-import {
-  formatHealth,
-  formatChannels,
-  formatStatus,
-  formatNotify,
-  formatInvoke,
-} from "./lib/format.js";
+/**
+ * dsh-wsl-im — IM ↔ dsh agent bridge.
+ *
+ * Runtime: platforms talk to this plugin; replies come from `ctx.agents`
+ * (same pattern as community dsh-im-hub). OryxOS is a *protocol reference*
+ * only — see docs/PROTOCOL.md. This plugin does NOT call OryxOS HTTP.
+ */
 
 export const name = "dsh-wsl-im";
-export const inject = ["tools", "systemPrompt"];
+export const inject = [
+  "agentDefaultModel",
+  "agents",
+  "sessions",
+  "loader",
+  "tools",
+  "systemPrompt",
+];
 
-export function apply(ctx, config = {}) {
-  const cfg = resolveOryxConfig(config);
-  const pub = publicConfigStatus(cfg);
+import { Bridge } from "./lib/bridge.js";
+import { resolveConfig } from "./lib/config.js";
+
+export function apply(ctx, raw = {}) {
+  const config = resolveConfig(raw, process.env);
+  let bridge;
 
   ctx.systemPrompt.section({
-    name: "tool:oryx_im",
-    order: 125,
-    text: [
-      "OryxOS is the IM gateway for this suite — do NOT call Feishu/Telegram/etc. SDKs directly.",
-      "Use oryx_im_status / oryx_im_list to see inbound channels (types: " +
-        ORYX_IM_TYPES.join(", ") +
-        ").",
-      "Use oryx_invoke to talk to a local OryxOS agent bound in channels.yaml.",
-      "Use oryx_notify_list for outbound notify channel defs (proactive push is via agent notify tools inside OryxOS).",
-      `Configured baseUrl=${pub.baseUrl}; apiKeySet=${pub.apiKeySet}; defaultAgent=${pub.defaultAgent || "(none)"}.`,
-      "Never paste ORYXOS_API_KEY or channel secrets into chat.",
-    ].join(" "),
+    name: "tool:im_status",
+    order: 126,
+    text:
+      "dsh-wsl-im bridges Feishu / WeCom (aibot WS) / DingTalk Stream / QQ Gateway " +
+      "directly into dsh agents. Protocols mirror OryxOS adapters; do not route through OryxOS. " +
+      "Use im_status to see which adapters are up. Never paste bot secrets into chat.",
   });
 
-  register(ctx, {
-    name: "oryx_health",
-    description: "Check local OryxOS HTTP reachability (GET /api/v1/health).",
-    parameters: { type: "object", additionalProperties: false, properties: {} },
-    timeoutMs: cfg.timeoutMs,
-    execute: async () => health(cfg),
-    format: formatHealth,
-    title: "OryxOS health",
-  });
-
-  register(ctx, {
-    name: "oryx_im_list",
-    description:
-      "List OryxOS inbound IM channel defs (GET /api/v1/channels). Covers platforms already wired in OryxOS (feishu, wecom, telegram, …).",
-    parameters: { type: "object", additionalProperties: false, properties: {} },
-    timeoutMs: cfg.timeoutMs,
-    execute: async () => listChannels(cfg),
-    format: formatChannels,
-    title: "OryxOS IM list",
-  });
-
-  register(ctx, {
-    name: "oryx_im_status",
-    description:
-      "Live status of OryxOS inbound IM channels (GET /api/v1/channels/status) — CONNECTED / DISCONNECTED etc.",
-    parameters: { type: "object", additionalProperties: false, properties: {} },
-    timeoutMs: cfg.timeoutMs,
-    execute: async () => channelStatus(cfg),
-    format: formatStatus,
-    title: "OryxOS IM status",
-  });
-
-  register(ctx, {
-    name: "oryx_notify_list",
-    description:
-      "List OryxOS outbound notify channel resources (GET /api/v1/notify-channels). Sending is done by OryxOS agent tools, not this plugin.",
-    parameters: { type: "object", additionalProperties: false, properties: {} },
-    timeoutMs: cfg.timeoutMs,
-    execute: async () => listNotifyChannels(cfg),
-    format: formatNotify,
-    title: "OryxOS notify list",
-  });
-
-  register(ctx, {
-    name: "oryx_invoke",
-    description:
-      "Invoke a local OryxOS agent (POST /api/v1/agents/{name}/invoke). Prefer agents bound in .oryxos/channels.yaml so IM and console share the same brain.",
-    parameters: {
-      type: "object",
-      additionalProperties: false,
-      properties: {
-        agent: {
-          type: "string",
-          description: "Agent name; defaults to config.defaultAgent / ORYXOS_DEFAULT_AGENT.",
-        },
-        content: { type: "string", description: "User message to the agent." },
-      },
-      required: ["content"],
-    },
-    timeoutMs: cfg.timeoutMs,
-    execute: async (args) => invokeAgent(cfg, args),
-    format: formatInvoke,
-    title: "OryxOS invoke",
-  });
-}
-
-function register(ctx, { name: toolName, description, parameters, timeoutMs, execute, format, title }) {
   ctx.tools.register({
-    name: toolName,
-    description,
-    parameters,
+    name: "im_status",
+    description: "Show dsh-wsl-im adapter status (Feishu / WeCom / DingTalk / QQ / mock).",
+    parameters: { type: "object", additionalProperties: false, properties: {} },
     output: {
-      schema: {
-        type: "object",
-        additionalProperties: true,
-        properties: {
-          ok: { type: "boolean" },
-          error: { type: "string" },
-        },
-      },
-      render: (_args, value) => [{ type: "text", text: format(value) }],
+      schema: { type: "object", additionalProperties: true },
+      render: (_a, v) => [{ type: "text", text: formatStatus(v) }],
     },
-    timeoutMs,
+    timeoutMs: 5_000,
     isConcurrencySafe: () => true,
-    execute,
-    presentCall: () => ({ card: "generic", title }),
-    presentResult: (_args, result) => ({
+    async execute() {
+      return bridge ? bridge.status() : { ok: false, error: "bridge not started" };
+    },
+    presentCall: () => ({ card: "generic", title: "IM status" }),
+    presentResult: (_a, r) => ({
       card: "generic",
-      title: result.isError ? `${title} failed` : title,
-      content: result.content,
+      title: r.isError ? "IM status failed" : "IM status",
+      content: r.content,
     }),
   });
+
+  const start = () => {
+    if (bridge) {
+      bridge.stop();
+      bridge = undefined;
+    }
+    if (!config.enabled) {
+      ctx.logger?.info?.("dsh-wsl-im: disabled");
+      return;
+    }
+    bridge = new Bridge(ctx, config);
+    bridge.start().catch((err) => {
+      ctx.logger?.warn?.(
+        `dsh-wsl-im: start failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    });
+  };
+
+  ctx.on("dispose", () => {
+    if (bridge) bridge.stop();
+  });
+  start();
+}
+
+function formatStatus(v) {
+  if (!v?.ok) return `im_status FAIL: ${v?.error || "unknown"}`;
+  const lines = (v.adapters || []).map(
+    (a) => `- ${a.name}: ${a.state}${a.detail ? ` (${a.detail})` : ""}`,
+  );
+  return [`im_status OK — chats=${v.chats ?? 0}`, ...lines].join("\n");
 }

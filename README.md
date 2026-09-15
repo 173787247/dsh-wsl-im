@@ -1,10 +1,10 @@
 # dsh-wsl-im
 
-DeepSeek Harness tools that bridge **dsh ↔ local [OryxOS](https://github.com/)** IM stack.
+DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ**.
 
 [中文说明 → README.zh.md](./README.zh.md)
 
-> **Not in dsh-wsl-kit yet.** Install this repo directly. Prefer OryxOS as the only IM gateway — this plugin never embeds Feishu / WeCom / Telegram SDKs.
+> **Runtime does not use OryxOS.** Platform protocols are **referenced from** [OryxOS](https://github.com/) channel adapters (see [`docs/PROTOCOL.md`](./docs/PROTOCOL.md)). Messages go: `IM → this plugin → ctx.agents → reply`.
 
 ---
 
@@ -12,43 +12,40 @@ DeepSeek Harness tools that bridge **dsh ↔ local [OryxOS](https://github.com/)
 
 | Field | Value |
 |-------|-------|
-| **Plugin** | `dsh-wsl-im` **0.1.0** |
-| **Minimum dsh** | ≥ **0.1.2** (web UI one-shot `?token=` on Windows relay `:3081`) |
+| **Plugin** | `dsh-wsl-im` **0.2.0** |
+| **Minimum dsh** | ≥ **0.1.2** |
 | **Latest verified** | See [dsh-wsl-kit Compatibility](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) |
 | **Kit set** | not in kit yet |
-| **Cloud Flash** | Use model id **`deepseek-flash`** — not configured by this plugin |
-| **Agent Teams** | Upstream experimental; not required here |
-| **OryxOS** | Local HTTP `ORYXOS_BASE_URL` (default `http://127.0.0.1:8080`) |
+| **Cloud Flash** | `deepseek-flash` — not configured here |
 
 ## Architecture
 
 ```
-IM (feishu / telegram / …)
-        ↕  OryxOS channel adapters (.oryxos/channels.yaml)
-OryxOS HTTP  /api/v1/channels|status|notify-channels|agents/.../invoke
-        ↕  dsh-wsl-im tools
-       dsh
+Feishu WS / WeCom aibot WS / DingTalk Stream / QQ Gateway
+        ↕  adapters (OryxOS protocol reference)
+   dsh-wsl-im Bridge
+        ↕  ctx.agents.create + followup
+       dsh agent session → reply text back to IM
 ```
 
-**Inbound IM → OryxOS agent** already works inside OryxOS (bind `agent:` in `channels.yaml`).  
-**dsh → OryxOS** uses this plugin to inspect channels and `oryx_invoke` the same agents.  
-**Proactive push to IM** stays inside OryxOS (agent `notify_*` tools / notify-channel defs) — list them with `oryx_notify_list`.
+## Adapters (v0.2 test set)
 
-### Platforms OryxOS already wires (inbound)
+| Adapter | Mode | Creds |
+|---------|------|-------|
+| `feishu` | Long connection | `FEISHU_APP_ID` / `FEISHU_APP_SECRET` |
+| `wecom` | 智能机器人 WSS | `WECOM_BOT_ID` / `WECOM_BOT_SECRET` |
+| `dingtalk` | Stream | `DINGTALK_CLIENT_ID` / `DINGTALK_CLIENT_SECRET` |
+| `qq` | Official Gateway | `QQ_APP_ID` / `QQ_APP_SECRET` |
+| `mock` | Local HTTP | `DSH_IM_MOCK=1` → `POST http://127.0.0.1:18999/mock` |
 
-`feishu` · `wecom` · `dingtalk` · `slack` · `discord` · `telegram` · `whatsapp` · `teams` · `gchat` · `mattermost` · `matrix` · `qq` · `douyin` · `weixin` · `weixin_kf` · `weixin_mp` · `weixin_mini` · `alipay`
+Enable with `DSH_IM_FEISHU=1` (etc.) or `adapters.*.enabled: true` in patch config.
 
-(Specs-only / not built: taobao, pdd.)
+### Feishu peer dependency
 
-## Tools
-
-| Tool | OryxOS API | Purpose |
-|------|------------|---------|
-| `oryx_health` | `GET /api/v1/health` | Reachability |
-| `oryx_im_list` | `GET /api/v1/channels` | Channel defs (name/type/agent) |
-| `oryx_im_status` | `GET /api/v1/channels/status` | Live CONNECTED / … |
-| `oryx_notify_list` | `GET /api/v1/notify-channels` | Outbound notify resources |
-| `oryx_invoke` | `POST /api/v1/agents/{name}/invoke` | Stateless talk to an agent |
+```sh
+# inside the dsh profile / plugin install tree
+npm i @larksuiteoapi/node-sdk
+```
 
 ## Install
 
@@ -58,26 +55,20 @@ dsh plugin --profile web add github:173787247/dsh-wsl-im
 # dsh plugin --profile web add /mnt/c/Users/.../dsh-wsl-im
 ```
 
-Then restart web (`dsh-wsl-kit/scripts/restart-dsh-web.sh`) and open a **new** session.
+Source env (see `examples/dsh-wsl-im.env.example`), restart web, **new session**. Tool: `im_status`.
 
-## Config
-
-`cordis.patch.yml` / env (see `examples/dsh-wsl-im.env.example`):
-
-| Key | Env | Default |
-|-----|-----|---------|
-| `baseUrl` | `ORYXOS_BASE_URL` | `http://127.0.0.1:8080` |
-| `apiKey` | `ORYXOS_API_KEY` | empty |
-| `defaultAgent` | `ORYXOS_DEFAULT_AGENT` | empty |
-| `timeoutMs` | `ORYXOS_TIMEOUT_MS` | `60000` |
-
-Optional: `source ~/.dsh/dsh-wsl-im.env` before restart. **Never** paste keys into chat or tool output.
-
-## Test
+### Mock smoke (no real bot)
 
 ```sh
-npm test
+export DSH_IM_MOCK=1
+# restart dsh web, then:
+curl -s http://127.0.0.1:18999/mock -H 'content-type: application/json' \
+  -d '{"text":"/status","chatId":"t1"}'
 ```
+
+## Security
+
+Empty `allowedUserIds` = everyone. Set a whitelist before exposing bots. IM input can drive tools on the host.
 
 ## License
 

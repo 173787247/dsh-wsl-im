@@ -27,6 +27,8 @@
           cwd: ""
           provider: ""
           model: ""
+          preset: standard
+          permissionPreset: danger-full-access
           maxMessageLength: 4000
           idleTimeoutMs: 1800000
           instructionPrefix: ""

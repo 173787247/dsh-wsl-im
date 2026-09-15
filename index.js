@@ -14,6 +14,9 @@ export const inject = [
   "loader",
   "tools",
   "systemPrompt",
+  "attachments",
+  "agentPresets",
+  "permissionPresets",
 ];
 
 import { Bridge } from "./lib/bridge.js";
@@ -59,14 +62,19 @@ export function apply(ctx, raw = {}) {
       bridge = undefined;
     }
     if (!config.enabled) {
+      console.info("[dsh-wsl-im] disabled");
       ctx.logger?.info?.("dsh-wsl-im: disabled");
       return;
     }
+    const flags = Object.entries(config.adapters)
+      .filter(([, v]) => v?.enabled)
+      .map(([k]) => k);
+    console.info(`[dsh-wsl-im] starting adapters=[${flags.join(",") || "none"}]`);
     bridge = new Bridge(ctx, config);
     bridge.start().catch((err) => {
-      ctx.logger?.warn?.(
-        `dsh-wsl-im: start failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[dsh-wsl-im] start failed: ${msg}`);
+      ctx.logger?.warn?.(`dsh-wsl-im: start failed: ${msg}`);
     });
   };
 

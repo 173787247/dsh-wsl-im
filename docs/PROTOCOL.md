@@ -26,3 +26,12 @@ IM adapter → Bridge.handleMessage → ctx.agents.create / followup → session
 ```
 
 Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/WeCom/DingTalk/QQ stay one package.
+
+## WSL notes
+
+All four adapters are **outbound** long connections — no public callback URL / inbound port map on Windows.
+
+1. Credentials must be in the **WSL** process env (or sourced before `restart-dsh-web.sh`), not only Windows.
+2. Windows VPN/proxy may not apply inside WSL; fix WSL egress if subscribe/connect fails.
+3. QQ IP allowlists must use the **WSL egress IP** (often ≠ Windows host).
+4. WeCom: one Bot = one live long connection (a new connect kicks the old).

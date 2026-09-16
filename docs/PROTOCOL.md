@@ -39,7 +39,7 @@ IM adapter → Bridge.handleMessage → ctx.agents.create / followup → session
 
 Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/WeCom/DingTalk/QQ stay one package.
 
-Agent cwd is one directory per platform under `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}` (override the parent with `DSH_IM_AGENT_CWD`). Each chat is still its own session.
+Agent cwd is one directory per platform under `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}` (override the parent with `DSH_IM_AGENT_CWD`). Plugin startup calls `ctx.workspaceRegistry.create` so those four folders appear in the desktop sidebar. Each chat is still its own session.
 
 ## WSL notes
 

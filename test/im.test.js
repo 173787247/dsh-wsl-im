@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync } from "node:fs";
 import { describe, it } from "node:test";
 import { resolveConfig } from "../lib/config.js";
-import { splitText, resolveImWorkspace } from "../lib/bridge.js";
+import { splitText, resolveImWorkspace, ensureImWorkspaces, IM_WORKSPACE_PRESETS } from "../lib/bridge.js";
 import { extractText, parseFeishuMessage, feishuGroupMentioned } from "../lib/adapters/feishu.js";
 import { extractWecomText } from "../lib/adapters/wecom.js";
 import { extractDingText, parseDingMessage } from "../lib/adapters/dingtalk.js";
@@ -42,6 +42,26 @@ describe("resolveImWorkspace", () => {
     assert.equal(resolveImWorkspace("feishu", { base }), join(base, "feishu"));
     assert.equal(resolveImWorkspace("QQ", { base }), join(base, "qq"));
     assert.equal(resolveImWorkspace("../evil", { base }), join(base, "evil"));
+  });
+  it("registers four titled workspaces", async () => {
+    const base = mkdtempSync(join(tmpdir(), "im-reg-"));
+    const calls = [];
+    const rows = await ensureImWorkspaces(
+      {
+        async create(dir, title) {
+          calls.push([dir, title]);
+          return { id: title, path: dir };
+        },
+      },
+      { base },
+    );
+    assert.deepEqual(
+      rows.map((r) => r.title),
+      IM_WORKSPACE_PRESETS.map(([, title]) => title),
+    );
+    assert.equal(calls.length, 4);
+    assert.equal(calls[0][0], join(base, "feishu"));
+    assert.equal(calls[0][1], "飞书");
   });
 });
 

@@ -22,7 +22,7 @@
 
 入站图片 / 文件（含 PDF）/ 语音 / 视频已与企微对齐：图片进视觉，PDF 用 `pdftotext`，语音只用平台转写（QQ `asr_refer_text`；飞书/钉钉没有转写就落盘并请改发文字），视频只落盘、不抽帧。群消息需 @ 机器人。本机 WSL 直连这三家会超时，长连接和下载在设置了 `HTTPS_PROXY` 时走同一条代理。
 
-每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`，新消息才会进子目录。桌面需要分别添加这四个文件夹才能看到分组。
+每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`。插件启动时会登记进 dsh 工作区列表，侧边栏显示为飞书、企微、钉钉、QQ，不用手动添加。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`。
 
 ## 安装
 

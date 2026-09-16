@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+- Feishu, DingTalk, and QQ inbound now match WeCom: image, file/PDF, voice, and video.
+- Voice uses platform ASR when present (`asr_refer_text` on QQ); otherwise the audio is saved and the user is asked for text (no Whisper).
+- Video is saved to the workspace but not frame-transcribed.
+- Group messages without @ are ignored on Feishu and DingTalk, matching OryxOS.
+
 ## 0.2.1
 
 - IM sessions mount `agentPresets` (default `standard`) so bash/read/fs are available.

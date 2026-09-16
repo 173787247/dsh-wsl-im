@@ -19,6 +19,18 @@ This plugin **does not call OryxOS**. It re-implements the same platform protoco
 | QQ | `QQ_APP_ID` / `QQ_APP_SECRET` + `DSH_IM_QQ=1` |
 | Mock | `DSH_IM_MOCK=1` |
 
+## Inbound media
+
+Same contract as WeCom: adapters pass `images` / `files` into `onMessage`. The bridge mounts `standard`, copies files into `inbox/`, and pre-extracts PDF text with `pdftotext`. No ffmpeg/Whisper on this host — video is stored only; voice is usable only when the platform supplies a transcript.
+
+| Platform | Image | File / PDF | Voice | Video |
+|----------|-------|------------|-------|-------|
+| Feishu | `image_key` + GetMessageResource `type=image` | `file_key` `type=file` | `audio` + `file_key` (often silk; no platform ASR) | `media` + `file_key` |
+| DingTalk | `picture` + `downloadCode` or `picURL` | `file` + `downloadCode` / `downloadUrl` | `audio` + `downloadCode` | `video` + `downloadCode` |
+| QQ | `attachments[]` image mime or width/height | pdf / other → file | prefer `voice_wav_url`; text from `asr_refer_text` | `video/*`, `.mp4`, `.mov` |
+
+Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs.com` / `*.alicdn.com`, `*.qq.com` / `*.ugcimg.cn`). If `HTTPS_PROXY` is set, token / Stream / Gateway / media downloads use that agent — this WSL has no direct egress to those hosts.
+
 ## dsh side
 
 ```

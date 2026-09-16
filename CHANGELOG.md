@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4
+
+- Each IM gets its own dsh workspace: `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`. Chats stay one session each; the sidebar groups by platform. `DSH_IM_AGENT_CWD` is the parent directory.
+
 ## 0.2.3
 
 - DingTalk inbound media accepts `http` OSS temp URLs (`*.aliyuncs.com`) and downloads them through `HTTPS_PROXY` when set.

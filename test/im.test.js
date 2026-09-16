@@ -1,7 +1,10 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import assert from "node:assert/strict";
+import { mkdtempSync } from "node:fs";
 import { describe, it } from "node:test";
 import { resolveConfig } from "../lib/config.js";
-import { splitText } from "../lib/bridge.js";
+import { splitText, resolveImWorkspace } from "../lib/bridge.js";
 import { extractText, parseFeishuMessage, feishuGroupMentioned } from "../lib/adapters/feishu.js";
 import { extractWecomText } from "../lib/adapters/wecom.js";
 import { extractDingText, parseDingMessage } from "../lib/adapters/dingtalk.js";
@@ -30,6 +33,15 @@ describe("splitText", () => {
   it("chunks long replies", () => {
     const parts = splitText("aa\nbb\ncc", 3);
     assert.ok(parts.length >= 2);
+  });
+});
+
+describe("resolveImWorkspace", () => {
+  it("uses one directory per platform and strips path tricks", () => {
+    const base = mkdtempSync(join(tmpdir(), "im-ws-"));
+    assert.equal(resolveImWorkspace("feishu", { base }), join(base, "feishu"));
+    assert.equal(resolveImWorkspace("QQ", { base }), join(base, "qq"));
+    assert.equal(resolveImWorkspace("../evil", { base }), join(base, "evil"));
   });
 });
 

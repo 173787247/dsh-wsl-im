@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- DingTalk inbound media accepts `http` OSS temp URLs (`*.aliyuncs.com`) and downloads them through `HTTPS_PROXY` when set.
+
 ## 0.2.2
 
 - Feishu, DingTalk, and QQ inbound now match WeCom: image, file/PDF, voice, and video.

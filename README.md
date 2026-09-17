@@ -20,7 +20,7 @@ DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ
 
 ## Architecture
 
-Not in `install.sh`. OryxOS is a protocol reference only.
+Not in `install.sh`. Wire behavior follows vendor docs.
 
 ```mermaid
 flowchart TB

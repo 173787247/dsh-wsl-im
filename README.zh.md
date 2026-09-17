@@ -8,7 +8,7 @@
 
 ## 在套件里的位置
 
-不在 `install.sh` 里。OryxOS 只作协议参照。
+不在 `install.sh` 里。行为以厂商协议文档为准。
 
 ```mermaid
 flowchart TB

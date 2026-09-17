@@ -2,8 +2,8 @@
  * dsh-wsl-im — IM ↔ dsh agent bridge.
  *
  * Runtime: platforms talk to this plugin; replies come from `ctx.agents`
- * (same pattern as community dsh-im-hub). OryxOS is a *protocol reference*
- * only — see docs/PROTOCOL.md. This plugin does NOT call OryxOS HTTP.
+ * Independent rewrite of the vendor wire protocols. OryxOS is not called
+ * and its code is not included. See docs/PROVENANCE.md.
  */
 
 export const name = "dsh-wsl-im";
@@ -32,7 +32,7 @@ export function apply(ctx, raw = {}) {
     order: 126,
     text:
       "dsh-wsl-im bridges Feishu / WeCom (aibot WS) / DingTalk Stream / QQ Gateway " +
-      "directly into dsh agents. Protocols mirror OryxOS adapters; do not route through OryxOS. " +
+      "directly into dsh agents. Wire behavior follows vendor docs; this plugin does not include OryxOS code. " +
       "Use im_status to see which adapters are up. Never paste bot secrets into chat.",
   });
 

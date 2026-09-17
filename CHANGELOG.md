@@ -3,6 +3,7 @@
 ## 0.2.4
 
 - Each IM gets its own dsh workspace: `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`. Startup registers them with titles 飞书 / 企微 / 钉钉 / QQ so the sidebar lists them without a manual add. Chats stay one session each. `DSH_IM_AGENT_CWD` is the parent directory.
+- State in adapters, README, and CONTRIBUTING that this plugin is an independent rewrite. Rewrite the WeCom empty-ASR reply so it is not the same sentence as any other client. See `docs/PROVENANCE.md`.
 
 ## 0.2.3
 

@@ -1,6 +1,6 @@
 # Protocol notes
 
-Independent rewrite. Vendor documents are the source of wire behavior. See [`PROVENANCE.md`](./PROVENANCE.md).
+Wire behavior follows each vendor's documents.
 
 | Platform | Mode | This plugin |
 |----------|------|-------------|

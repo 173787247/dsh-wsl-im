@@ -4,7 +4,7 @@
 
 [English → README.md](./README.md)
 
-> **独立重写。** 行为以厂商协议文档为准。见 [`docs/PROVENANCE.md`](./docs/PROVENANCE.md)。链路：`IM → 本插件 → ctx.agents → 回 IM`。
+链路：`IM → 本插件 → ctx.agents → 回 IM`。
 
 ## 在套件里的位置
 

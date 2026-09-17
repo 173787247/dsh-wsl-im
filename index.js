@@ -1,9 +1,7 @@
 /**
  * dsh-wsl-im — IM ↔ dsh agent bridge.
  *
- * Runtime: platforms talk to this plugin; replies come from `ctx.agents`
- * Independent rewrite of the vendor wire protocols.
- * See docs/PROVENANCE.md.
+ * Runtime: platforms talk to this plugin; replies come from `ctx.agents`.
  */
 
 export const name = "dsh-wsl-im";

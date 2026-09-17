@@ -4,7 +4,7 @@ DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ
 
 [中文说明 → README.zh.md](./README.zh.md)
 
-> **Independent rewrite.** Vendor docs define the wire protocol. See [`docs/PROVENANCE.md`](./docs/PROVENANCE.md). Messages go: `IM → this plugin → ctx.agents → reply`.
+Messages go: `IM → this plugin → ctx.agents → reply`.
 
 ---
 

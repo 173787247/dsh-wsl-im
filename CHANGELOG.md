@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- State in adapters, README, and CONTRIBUTING that this plugin is an independent rewrite. Rewrite the WeCom empty-ASR reply so it is not the same sentence as any other client. See `docs/PROVENANCE.md`.
+- WeCom asks for a text message when a voice clip has no transcript.
 
 ## 0.2.3
 

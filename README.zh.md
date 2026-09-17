@@ -4,7 +4,7 @@
 
 [English → README.md](./README.md)
 
-> **独立重写。** 行为以厂商协议文档为准。OryxOS 只作行为参考，未使用其代码。见 [`docs/PROVENANCE.md`](./docs/PROVENANCE.md)。链路：`IM → 本插件 → ctx.agents → 回 IM`。
+> **独立重写。** 行为以厂商协议文档为准。见 [`docs/PROVENANCE.md`](./docs/PROVENANCE.md)。链路：`IM → 本插件 → ctx.agents → 回 IM`。
 
 ## 首批测试
 
@@ -18,7 +18,7 @@
 
 飞书还需在 profile 里安装 `@larksuiteoapi/node-sdk`。
 
-企微 WSS（`openws.work.weixin.qq.com`）在本机常需走 `HTTPS_PROXY`/`HTTP_PROXY`（`ws` 不吃 `NODE_USE_ENV_PROXY`）。同一 Bot 同时只能一条长连接——测 dsh 时请关掉 OryxOS/OpenClaw 上的同 Bot。
+企微 WSS（`openws.work.weixin.qq.com`）在本机常需走 `HTTPS_PROXY`/`HTTP_PROXY`（`ws` 不吃 `NODE_USE_ENV_PROXY`）。同一 Bot 同时只能一条长连接——测 dsh 时请关掉挂着同一个 Bot 的其它客户端。
 
 入站图片 / 文件（含 PDF）/ 语音 / 视频已与企微对齐：图片进视觉，PDF 用 `pdftotext`，语音只用平台转写（QQ `asr_refer_text`；飞书/钉钉没有转写就落盘并请改发文字），视频只落盘、不抽帧。群消息需 @ 机器人。本机 WSL 直连这三家会超时，长连接和下载在设置了 `HTTPS_PROXY` 时走同一条代理。
 

@@ -1,13 +1,13 @@
 # Protocol notes
 
-Independent rewrite. Vendor documents are the source of wire behavior. The Java names below were used as a behavior checklist only — those sources are not copied. See [`PROVENANCE.md`](./PROVENANCE.md).
+Independent rewrite. Vendor documents are the source of wire behavior. See [`PROVENANCE.md`](./PROVENANCE.md).
 
-| Platform | Mode | Behavior checklist (not copied) | This plugin |
-|----------|------|-------------------------|-------------|
-| Feishu | WS long connection (`im.message.receive_v1`) | `oryxos-channel-feishu` / `FeishuChannelAdapter` | `lib/adapters/feishu.js` via `@larksuiteoapi/node-sdk` |
-| WeCom | 智能机器人 WSS `openws.work.weixin.qq.com` | `oryxos-channel-wecom` / `WeComWsClient` | `lib/adapters/wecom.js` (`aibot_subscribe` / `aibot_msg_callback` / `aibot_send_msg`) |
-| DingTalk | Stream gateway | `oryxos-channel-dingtalk` / `DingTalkStreamClient` | `lib/adapters/dingtalk.js` + `sessionWebhook` reply |
-| QQ | Official Bot Gateway | `oryxos-channel-qq` / `QqGatewayClient` | `lib/adapters/qq.js` (Identify intent `GROUP_AND_C2C_EVENT`) |
+| Platform | Mode | This plugin |
+|----------|------|-------------|
+| Feishu | WS long connection (`im.message.receive_v1`) | `lib/adapters/feishu.js` via `@larksuiteoapi/node-sdk` |
+| WeCom | 智能机器人 WSS `openws.work.weixin.qq.com` | `lib/adapters/wecom.js` (`aibot_subscribe` / `aibot_msg_callback` / `aibot_send_msg`) |
+| DingTalk | Stream gateway | `lib/adapters/dingtalk.js` + `sessionWebhook` reply |
+| QQ | Official Bot Gateway | `lib/adapters/qq.js` (Identify intent `GROUP_AND_C2C_EVENT`) |
 
 ## Env names
 

@@ -4,7 +4,7 @@ DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ
 
 [中文说明 → README.zh.md](./README.zh.md)
 
-> **Independent rewrite.** Vendor docs define the wire protocol. OryxOS was a behavior reference only; its code is not included. See [`docs/PROVENANCE.md`](./docs/PROVENANCE.md). Messages go: `IM → this plugin → ctx.agents → reply`.
+> **Independent rewrite.** Vendor docs define the wire protocol. See [`docs/PROVENANCE.md`](./docs/PROVENANCE.md). Messages go: `IM → this plugin → ctx.agents → reply`.
 
 ---
 
@@ -49,7 +49,7 @@ npm i @larksuiteoapi/node-sdk
 
 ### WeCom proxy
 
-`openws.work.weixin.qq.com` often needs `HTTPS_PROXY`/`HTTP_PROXY`. The adapter uses `https-proxy-agent` (`ws` ignores `NODE_USE_ENV_PROXY`). One Bot = one live WS — disable the same Bot on OryxOS/OpenClaw while testing.
+`openws.work.weixin.qq.com` often needs `HTTPS_PROXY`/`HTTP_PROXY`. The adapter uses `https-proxy-agent` (`ws` ignores `NODE_USE_ENV_PROXY`). One Bot = one live WS — stop any other client on the same Bot while testing.
 
 ## Install
 

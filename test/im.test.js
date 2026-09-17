@@ -11,7 +11,7 @@ import { extractDingText, parseDingMessage } from "../lib/adapters/dingtalk.js";
 import { parseQqDispatch } from "../lib/adapters/qq.js";
 
 describe("resolveConfig", () => {
-  it("maps OryxOS-style env names", () => {
+  it("maps vendor env names", () => {
     const cfg = resolveConfig(
       { adapters: { feishu: { enabled: false } } },
       {

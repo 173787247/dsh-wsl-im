@@ -4,7 +4,7 @@ DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ
 
 [中文说明 → README.zh.md](./README.zh.md)
 
-> **Runtime does not use OryxOS.** Platform protocols are **referenced from** [OryxOS](https://github.com/) channel adapters (see [`docs/PROTOCOL.md`](./docs/PROTOCOL.md)). Messages go: `IM → this plugin → ctx.agents → reply`.
+> **Independent rewrite.** Vendor docs define the wire protocol. OryxOS was a behavior reference only; its code is not included. See [`docs/PROVENANCE.md`](./docs/PROVENANCE.md). Messages go: `IM → this plugin → ctx.agents → reply`.
 
 ---
 
@@ -22,7 +22,7 @@ DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ
 
 ```
 Feishu WS / WeCom aibot WS / DingTalk Stream / QQ Gateway
-        ↕  adapters (OryxOS protocol reference)
+        ↕  adapters (vendor protocol docs)
    dsh-wsl-im Bridge
         ↕  ctx.agents.create + followup
        dsh agent session → reply text back to IM

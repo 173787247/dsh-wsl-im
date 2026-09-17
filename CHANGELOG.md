@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- State in adapters, README, and CONTRIBUTING that this plugin is an independent rewrite. Rewrite the WeCom empty-ASR reply so it is not the same sentence as any other client. See `docs/PROVENANCE.md`.
+
 ## 0.2.3
 
 - DingTalk inbound media accepts `http` OSS temp URLs (`*.aliyuncs.com`) and downloads them through `HTTPS_PROXY` when set.

@@ -4,7 +4,7 @@
 
 [English → README.md](./README.md)
 
-> **运行时不经过 OryxOS。** 协议对齐 OryxOS 渠道适配器（见 [`docs/PROTOCOL.md`](./docs/PROTOCOL.md)）。链路：`IM → 本插件 → ctx.agents → 回 IM`。
+> **独立重写。** 行为以厂商协议文档为准。OryxOS 只作行为参考，未使用其代码。见 [`docs/PROVENANCE.md`](./docs/PROVENANCE.md)。链路：`IM → 本插件 → ctx.agents → 回 IM`。
 
 ## 首批测试
 

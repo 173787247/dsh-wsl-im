@@ -6,6 +6,7 @@
 
 链路：`IM → 本插件 → ctx.agents → 回 IM`。
 
+
 ## 在套件里的位置
 
 不在 `install.sh` 里。行为以厂商协议文档为准。
@@ -19,6 +20,7 @@ flowchart TB
 ```
 
 工作区是 `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`，插件启动时登记。一个聊天一条会话，不是整个平台共用一条。总图见 [dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.2.4**（可选，不在 install.sh）。
+
 
 ## 首批测试
 

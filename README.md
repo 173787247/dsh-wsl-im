@@ -30,7 +30,9 @@ flowchart TB
   agents --> reply["reply text back to that chat"]
 ```
 
+
 Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.2.4** (optional, not in install.sh).
+
 
 ## Adapters (v0.2 test set)
 

@@ -1,9 +1,7 @@
 /**
  * dsh-wsl-im — IM ↔ dsh agent bridge.
  *
- * Runtime: platforms talk to this plugin; replies come from `ctx.agents`
- * (same pattern as community dsh-im-hub). OryxOS is a *protocol reference*
- * only — see docs/PROTOCOL.md. This plugin does NOT call OryxOS HTTP.
+ * Runtime: platforms talk to this plugin; replies come from `ctx.agents`.
  */
 
 export const name = "dsh-wsl-im";
@@ -17,9 +15,10 @@ export const inject = [
   "attachments",
   "agentPresets",
   "permissionPresets",
+  "workspaceRegistry",
 ];
 
-import { Bridge } from "./lib/bridge.js";
+import { Bridge, ensureImWorkspaces } from "./lib/bridge.js";
 import { resolveConfig } from "./lib/config.js";
 
 export function apply(ctx, raw = {}) {
@@ -31,7 +30,7 @@ export function apply(ctx, raw = {}) {
     order: 126,
     text:
       "dsh-wsl-im bridges Feishu / WeCom (aibot WS) / DingTalk Stream / QQ Gateway " +
-      "directly into dsh agents. Protocols mirror OryxOS adapters; do not route through OryxOS. " +
+      "directly into dsh agents. Wire behavior follows vendor docs. " +
       "Use im_status to see which adapters are up. Never paste bot secrets into chat.",
   });
 
@@ -56,7 +55,7 @@ export function apply(ctx, raw = {}) {
     }),
   });
 
-  const start = () => {
+  const start = async () => {
     if (bridge) {
       bridge.stop();
       bridge = undefined;
@@ -65,6 +64,17 @@ export function apply(ctx, raw = {}) {
       console.info("[dsh-wsl-im] disabled");
       ctx.logger?.info?.("dsh-wsl-im: disabled");
       return;
+    }
+    try {
+      const rows = await ensureImWorkspaces(ctx.workspaceRegistry, {
+        base: config.agent.cwd || undefined,
+      });
+      console.info(
+        `[dsh-wsl-im] workspaces ${rows.map((w) => `${w.title}:${w.path}`).join(" | ")}`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[dsh-wsl-im] workspace register failed: ${msg}`);
     }
     const flags = Object.entries(config.adapters)
       .filter(([, v]) => v?.enabled)

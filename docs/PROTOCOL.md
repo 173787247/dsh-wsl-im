@@ -1,15 +1,15 @@
-# Protocol notes (OryxOS as reference)
+# Protocol notes
 
-This plugin **does not call OryxOS**. It re-implements the same platform protocols so IM chats drive **dsh agents** directly.
+Wire behavior follows each vendor's documents.
 
-| Platform | Mode | OryxOS reference (Java) | This plugin |
-|----------|------|-------------------------|-------------|
-| Feishu | WS long connection (`im.message.receive_v1`) | `oryxos-channel-feishu` / `FeishuChannelAdapter` | `lib/adapters/feishu.js` via `@larksuiteoapi/node-sdk` |
-| WeCom | 智能机器人 WSS `openws.work.weixin.qq.com` | `oryxos-channel-wecom` / `WeComWsClient` | `lib/adapters/wecom.js` (`aibot_subscribe` / `aibot_msg_callback` / `aibot_send_msg`) |
-| DingTalk | Stream gateway | `oryxos-channel-dingtalk` / `DingTalkStreamClient` | `lib/adapters/dingtalk.js` + `sessionWebhook` reply |
-| QQ | Official Bot Gateway | `oryxos-channel-qq` / `QqGatewayClient` | `lib/adapters/qq.js` (Identify intent `GROUP_AND_C2C_EVENT`) |
+| Platform | Mode | This plugin |
+|----------|------|-------------|
+| Feishu | WS long connection (`im.message.receive_v1`) | `lib/adapters/feishu.js` via `@larksuiteoapi/node-sdk` |
+| WeCom | 智能机器人 WSS `openws.work.weixin.qq.com` | `lib/adapters/wecom.js` (`aibot_subscribe` / `aibot_msg_callback` / `aibot_send_msg`) |
+| DingTalk | Stream gateway | `lib/adapters/dingtalk.js` + `sessionWebhook` reply |
+| QQ | Official Bot Gateway | `lib/adapters/qq.js` (Identify intent `GROUP_AND_C2C_EVENT`) |
 
-## Env mapping (aligned with OryxOS `.env` names where possible)
+## Env names
 
 | Adapter | Env |
 |---------|-----|
@@ -38,6 +38,8 @@ IM adapter → Bridge.handleMessage → ctx.agents.create / followup → session
 ```
 
 Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/WeCom/DingTalk/QQ stay one package.
+
+Agent cwd is one directory per platform under `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}` (override the parent with `DSH_IM_AGENT_CWD`). Plugin startup calls `ctx.workspaceRegistry.create` so those four folders appear in the desktop sidebar. Each chat is still its own session.
 
 ## WSL notes
 

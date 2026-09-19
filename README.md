@@ -12,21 +12,27 @@ Messages go: `IM → this plugin → ctx.agents → reply`.
 
 | Field | Value |
 |-------|-------|
-| **Plugin** | `dsh-wsl-im` **0.2.0** |
+| **Plugin** | `dsh-wsl-im` **0.2.4** |
 | **Minimum dsh** | ≥ **0.1.2** |
 | **Latest verified** | See [dsh-wsl-kit Compatibility](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) |
-| **Kit set** | not in kit yet |
+| **Kit set** | not in `install.sh` (optional) |
 | **Cloud Flash** | `deepseek-flash` — not configured here |
 
 ## Architecture
 
+Not in `install.sh`. Wire behavior follows vendor docs.
+
+```mermaid
+flowchart TB
+  chats["Feishu / WeCom / DingTalk / QQ"] --> im["dsh-wsl-im"]
+  im --> ws["one workspace per IM"]
+  im --> agents["ctx.agents"]
+  agents --> reply["reply text back to that chat"]
 ```
-Feishu WS / WeCom aibot WS / DingTalk Stream / QQ Gateway
-        ↕  adapters (vendor protocol docs)
-   dsh-wsl-im Bridge
-        ↕  ctx.agents.create + followup
-       dsh agent session → reply text back to IM
-```
+
+
+Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.2.4** (optional, not in install.sh).
+
 
 ## Adapters (v0.2 test set)
 
@@ -54,9 +60,7 @@ npm i @larksuiteoapi/node-sdk
 ## Install
 
 ```sh
-# latest tagged release
-dsh plugin --profile web add github:173787247/dsh-wsl-im#v0.2.0
-# or track default branch
+# track default branch; do not pin 0.2.0
 dsh plugin --profile web add github:173787247/dsh-wsl-im
 ```
 

@@ -4,6 +4,10 @@
 
 - WeCom asks for a text message when a voice clip has no transcript.
 
+## 0.2.4
+
+- Each IM gets its own dsh workspace: `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`. Startup registers them with titles 飞书 / 企微 / 钉钉 / QQ so the sidebar lists them without a manual add. Chats stay one session each. `DSH_IM_AGENT_CWD` is the parent directory.
+
 ## 0.2.3
 
 - DingTalk inbound media accepts `http` OSS temp URLs (`*.aliyuncs.com`) and downloads them through `HTTPS_PROXY` when set.

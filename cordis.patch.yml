@@ -23,6 +23,10 @@
             enabled: false
             appId: ""
             appSecret: ""
+          slack:
+            enabled: false
+            botToken: ""
+            appToken: ""
         agent:
           cwd: ""
           provider: ""

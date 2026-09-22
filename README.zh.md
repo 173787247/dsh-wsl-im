@@ -1,6 +1,6 @@
 # dsh-wsl-im
 
-让 **飞书 / 企微 / 钉钉 / QQ** 直接和 **dsh** 对话。
+让 **飞书 / 企微 / 钉钉 / QQ / Slack** 直接和 **dsh** 对话。
 
 [English → README.md](./README.md)
 
@@ -13,13 +13,13 @@
 
 ```mermaid
 flowchart TB
-  chats["飞书 / 企微 / 钉钉 / QQ"] --> im["dsh-wsl-im"]
+  chats["飞书 / 企微 / 钉钉 / QQ / Slack"] --> im["dsh-wsl-im"]
   im --> ws["每个 IM 一个工作区"]
   im --> agents["ctx.agents"]
   agents --> reply["回复回到该聊天"]
 ```
 
-工作区是 `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`，插件启动时登记。一个聊天一条会话，不是整个平台共用一条。总图见 [dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.2.4**（可选，不在 install.sh）。
+工作区是 `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack}`，插件启动时登记。一个聊天一条会话，不是整个平台共用一条。总图见 [dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.3.0**（可选，不在 install.sh）。
 
 
 ## 首批测试
@@ -30,15 +30,16 @@ flowchart TB
 | 企微 | 智能机器人 WSS | `WECOM_BOT_ID` / `WECOM_BOT_SECRET` + `DSH_IM_WECOM=1` |
 | 钉钉 | Stream | `DINGTALK_CLIENT_ID` / `DINGTALK_CLIENT_SECRET` + `DSH_IM_DINGTALK=1` |
 | QQ | 官方 Gateway | `QQ_APP_ID` / `QQ_APP_SECRET` + `DSH_IM_QQ=1` |
+| Slack | Socket Mode | `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN` + `DSH_IM_SLACK=1` |
 | mock | 本机 HTTP | `DSH_IM_MOCK=1` |
 
 飞书还需在 profile 里安装 `@larksuiteoapi/node-sdk`。
 
-企微 WSS（`openws.work.weixin.qq.com`）在本机常需走 `HTTPS_PROXY`/`HTTP_PROXY`（`ws` 不吃 `NODE_USE_ENV_PROXY`）。同一 Bot 同时只能一条长连接——测 dsh 时请关掉挂着同一个 Bot 的其它客户端。
+企微 WSS（`openws.work.weixin.qq.com`）在本机常需走 `HTTPS_PROXY`/`HTTP_PROXY`（`ws` 不吃 `NODE_USE_ENV_PROXY`）。同一 Bot 同时只能一条长连接——测 dsh 时请关掉挂着同一个 Bot 的其它客户端。Slack Socket Mode 同理（App 级 `xapp-` 开连接，Bot `xoxb-` 回信）。
 
-入站图片 / 文件（含 PDF）/ 语音 / 视频已与企微对齐：图片进视觉，PDF 用 `pdftotext`，语音只用平台转写（QQ `asr_refer_text`；飞书/钉钉没有转写就落盘并请改发文字），视频只落盘、不抽帧。群消息需 @ 机器人。本机 WSL 直连这三家会超时，长连接和下载在设置了 `HTTPS_PROXY` 时走同一条代理。
+入站图片 / 文件（含 PDF）/ 语音 / 视频已与企微对齐：图片进视觉，PDF 用 `pdftotext`，语音只用平台转写（QQ `asr_refer_text`；飞书/钉钉/Slack 没有转写就落盘并请改发文字），视频只落盘、不抽帧。群消息需 @ 机器人（Slack 为 `app_mention`）。本机 WSL 直连这几家会超时，长连接和下载在设置了 `HTTPS_PROXY` 时走同一条代理。
 
-每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`。插件启动时会登记进 dsh 工作区列表，侧边栏显示为飞书、企微、钉钉、QQ，不用手动添加。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`。
+每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`、`slack`。插件启动时会登记进 dsh 工作区列表，侧边栏显示为飞书、企微、钉钉、QQ、Slack，不用手动添加。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`。
 
 ## 安装
 

@@ -1,6 +1,6 @@
 # dsh-wsl-im
 
-DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ**.
+DeepSeek Harness plugin: chat with **dsh** from **Feishu / WeCom / DingTalk / QQ / Slack**.
 
 [中文说明 → README.zh.md](./README.zh.md)
 
@@ -12,7 +12,7 @@ Messages go: `IM → this plugin → ctx.agents → reply`.
 
 | Field | Value |
 |-------|-------|
-| **Plugin** | `dsh-wsl-im` **0.2.4** |
+| **Plugin** | `dsh-wsl-im` **0.3.0** |
 | **Minimum dsh** | ≥ **0.1.2** |
 | **Latest verified** | See [dsh-wsl-kit Compatibility](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) |
 | **Kit set** | not in `install.sh` (optional) |
@@ -24,17 +24,17 @@ Not in `install.sh`. Wire behavior follows vendor docs.
 
 ```mermaid
 flowchart TB
-  chats["Feishu / WeCom / DingTalk / QQ"] --> im["dsh-wsl-im"]
+  chats["Feishu / WeCom / DingTalk / QQ / Slack"] --> im["dsh-wsl-im"]
   im --> ws["one workspace per IM"]
   im --> agents["ctx.agents"]
   agents --> reply["reply text back to that chat"]
 ```
 
 
-Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.2.4** (optional, not in install.sh).
+Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.3.0** (optional, not in install.sh).
 
 
-## Adapters (v0.2 test set)
+## Adapters
 
 | Adapter | Mode | Creds |
 |---------|------|-------|
@@ -42,9 +42,10 @@ Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq}`, registered on plu
 | `wecom` | 智能机器人 WSS | `WECOM_BOT_ID` / `WECOM_BOT_SECRET` |
 | `dingtalk` | Stream | `DINGTALK_CLIENT_ID` / `DINGTALK_CLIENT_SECRET` |
 | `qq` | Official Gateway | `QQ_APP_ID` / `QQ_APP_SECRET` |
+| `slack` | Socket Mode | `SLACK_BOT_TOKEN` (`xoxb-`) / `SLACK_APP_TOKEN` (`xapp-`) |
 | `mock` | Local HTTP | `DSH_IM_MOCK=1` → `POST http://127.0.0.1:18999/mock` |
 
-Enable with `DSH_IM_FEISHU=1` (etc.) or `adapters.*.enabled: true` in patch config.
+Enable with `DSH_IM_FEISHU=1` / `DSH_IM_SLACK=1` (etc.) or `adapters.*.enabled: true` in patch config.
 
 ### Feishu peer dependency
 

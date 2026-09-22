@@ -9,6 +9,12 @@ import { extractText, parseFeishuMessage, feishuGroupMentioned } from "../lib/ad
 import { extractWecomText } from "../lib/adapters/wecom.js";
 import { extractDingText, parseDingMessage } from "../lib/adapters/dingtalk.js";
 import { parseQqDispatch } from "../lib/adapters/qq.js";
+import {
+  parseSlackEvent,
+  segmentSlackText,
+  stripSlackMentions,
+  shouldDropSlackEvent,
+} from "../lib/adapters/slack.js";
 
 describe("resolveConfig", () => {
   it("maps vendor env names", () => {
@@ -21,11 +27,17 @@ describe("resolveConfig", () => {
         DSH_IM_WECOM: "true",
         WECOM_BOT_ID: "bot",
         WECOM_BOT_SECRET: "s",
+        DSH_IM_SLACK: "1",
+        SLACK_BOT_TOKEN: "xoxb-bot",
+        SLACK_APP_TOKEN: "xapp-app",
       },
     );
     assert.equal(cfg.adapters.feishu.enabled, true);
     assert.equal(cfg.adapters.feishu.appId, "cli_x");
     assert.equal(cfg.adapters.wecom.botId, "bot");
+    assert.equal(cfg.adapters.slack.enabled, true);
+    assert.equal(cfg.adapters.slack.botToken, "xoxb-bot");
+    assert.equal(cfg.adapters.slack.appToken, "xapp-app");
   });
 });
 
@@ -43,7 +55,7 @@ describe("resolveImWorkspace", () => {
     assert.equal(resolveImWorkspace("QQ", { base }), join(base, "qq"));
     assert.equal(resolveImWorkspace("../evil", { base }), join(base, "evil"));
   });
-  it("registers four titled workspaces", async () => {
+  it("registers titled workspaces for each IM", async () => {
     const base = mkdtempSync(join(tmpdir(), "im-reg-"));
     const calls = [];
     const rows = await ensureImWorkspaces(
@@ -59,9 +71,11 @@ describe("resolveImWorkspace", () => {
       rows.map((r) => r.title),
       IM_WORKSPACE_PRESETS.map(([, title]) => title),
     );
-    assert.equal(calls.length, 4);
+    assert.equal(calls.length, IM_WORKSPACE_PRESETS.length);
     assert.equal(calls[0][0], join(base, "feishu"));
     assert.equal(calls[0][1], "飞书");
+    assert.equal(calls.at(-1)[0], join(base, "slack"));
+    assert.equal(calls.at(-1)[1], "Slack");
   });
 });
 
@@ -207,5 +221,53 @@ describe("extractors", () => {
     assert.equal(video.text, "");
     assert.equal(video.items[0].kind, "video");
     assert.equal(parseQqDispatch("READY", { content: "x" }).skip, "event");
+  });
+});
+
+describe("slack", () => {
+  it("strips mentions and drops bots", () => {
+    assert.equal(stripSlackMentions("<@U123> hello"), "hello");
+    assert.equal(shouldDropSlackEvent({ bot_id: "B1", type: "message" }), true);
+    assert.equal(shouldDropSlackEvent({ type: "message", subtype: "message_changed" }), true);
+    assert.equal(shouldDropSlackEvent({ type: "message", subtype: "file_share" }), false);
+  });
+
+  it("parses DM message and app_mention", () => {
+    const dm = parseSlackEvent({
+      type: "message",
+      channel_type: "im",
+      user: "U1",
+      channel: "D1",
+      ts: "1.0",
+      text: "hi",
+    });
+    assert.equal(dm.text, "hi");
+    assert.equal(dm.isGroup, false);
+    assert.equal(dm.chatId, "D1");
+
+    const groupBare = parseSlackEvent({
+      type: "message",
+      channel_type: "channel",
+      user: "U1",
+      channel: "C1",
+      ts: "1.0",
+      text: "hi",
+    });
+    assert.equal(groupBare.skip, "group-without-mention");
+
+    const mention = parseSlackEvent({
+      type: "app_mention",
+      user: "U2",
+      channel: "C2",
+      ts: "2.0",
+      text: "<@UBOT> ping",
+    });
+    assert.equal(mention.text, "ping");
+    assert.equal(mention.isGroup, true);
+  });
+
+  it("segments long replies", () => {
+    const parts = segmentSlackText("abcdefghij", 4);
+    assert.deepEqual(parts, ["abcd", "efgh", "ij"]);
   });
 });

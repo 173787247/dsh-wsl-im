@@ -1,7 +1,7 @@
 {
   "name": "dsh-wsl-im",
-  "version": "0.3.0",
-  "description": "DeepSeek Harness IM bridge for WSL: Feishu / WeCom aibot / DingTalk Stream / QQ Gateway / Slack Socket Mode into ctx.agents (plus im_status tool).",
+  "version": "0.3.2",
+  "description": "DeepSeek Harness IM bridge for WSL: Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram into ctx.agents (plus im_status tool).",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,7 +40,9 @@
     "wecom",
     "dingtalk",
     "qq",
-    "slack"
+    "slack",
+    "discord",
+    "telegram"
   ],
   "dependencies": {
     "https-proxy-agent": "^7.0.6",

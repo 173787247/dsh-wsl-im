@@ -15,6 +15,16 @@ import {
   stripSlackMentions,
   shouldDropSlackEvent,
 } from "../lib/adapters/slack.js";
+import {
+  parseDiscordMessageCreate,
+  segmentDiscordText,
+  stripDiscordMentions,
+} from "../lib/adapters/discord.js";
+import {
+  parseTelegramUpdate,
+  segmentTelegramText,
+  mentionsTelegramBot,
+} from "../lib/adapters/telegram.js";
 
 describe("resolveConfig", () => {
   it("maps vendor env names", () => {
@@ -30,6 +40,12 @@ describe("resolveConfig", () => {
         DSH_IM_SLACK: "1",
         SLACK_BOT_TOKEN: "xoxb-bot",
         SLACK_APP_TOKEN: "xapp-app",
+        DSH_IM_DISCORD: "1",
+        DISCORD_BOT_TOKEN: "discord-token",
+        DISCORD_APPLICATION_ID: "app-id",
+        DSH_IM_TELEGRAM: "1",
+        TELEGRAM_BOT_TOKEN: "tg-token",
+        TELEGRAM_BOT_USERNAME: "MyBot",
       },
     );
     assert.equal(cfg.adapters.feishu.enabled, true);
@@ -38,6 +54,9 @@ describe("resolveConfig", () => {
     assert.equal(cfg.adapters.slack.enabled, true);
     assert.equal(cfg.adapters.slack.botToken, "xoxb-bot");
     assert.equal(cfg.adapters.slack.appToken, "xapp-app");
+    assert.equal(cfg.adapters.discord.enabled, true);
+    assert.equal(cfg.adapters.discord.botToken, "discord-token");
+    assert.equal(cfg.adapters.telegram.botUsername, "MyBot");
   });
 });
 
@@ -74,8 +93,8 @@ describe("resolveImWorkspace", () => {
     assert.equal(calls.length, IM_WORKSPACE_PRESETS.length);
     assert.equal(calls[0][0], join(base, "feishu"));
     assert.equal(calls[0][1], "飞书");
-    assert.equal(calls.at(-1)[0], join(base, "slack"));
-    assert.equal(calls.at(-1)[1], "Slack");
+    assert.equal(calls.at(-1)[0], join(base, "telegram"));
+    assert.equal(calls.at(-1)[1], "Telegram");
   });
 });
 
@@ -269,5 +288,80 @@ describe("slack", () => {
   it("segments long replies", () => {
     const parts = segmentSlackText("abcdefghij", 4);
     assert.deepEqual(parts, ["abcd", "efgh", "ij"]);
+  });
+});
+
+describe("discord", () => {
+  it("parses DM and requires mention in guild", () => {
+    const dm = parseDiscordMessageCreate({
+      id: "m1",
+      channel_id: "c1",
+      author: { id: "u1", bot: false },
+      content: "hi",
+    });
+    assert.equal(dm.text, "hi");
+    assert.equal(dm.isGroup, false);
+
+    const bare = parseDiscordMessageCreate(
+      {
+        id: "m2",
+        channel_id: "c2",
+        guild_id: "g1",
+        author: { id: "u1" },
+        content: "hi",
+        mentions: [],
+      },
+      { applicationId: "999" },
+    );
+    assert.equal(bare.skip, "group-without-mention");
+
+    const mentioned = parseDiscordMessageCreate(
+      {
+        id: "m3",
+        channel_id: "c3",
+        guild_id: "g1",
+        author: { id: "u1" },
+        content: "<@999> ping",
+        mentions: [{ id: "999" }],
+      },
+      { applicationId: "999" },
+    );
+    assert.equal(mentioned.text, "ping");
+    assert.equal(mentioned.isGroup, true);
+    assert.equal(stripDiscordMentions("<@!999> x"), "x");
+    assert.deepEqual(segmentDiscordText("abcdef", 2), ["ab", "cd", "ef"]);
+  });
+});
+
+describe("telegram", () => {
+  it("parses private message and group @bot", () => {
+    const dm = parseTelegramUpdate({
+      update_id: 1,
+      message: {
+        message_id: 9,
+        from: { id: 1, is_bot: false },
+        chat: { id: 1, type: "private" },
+        text: "hello",
+      },
+    });
+    assert.equal(dm.text, "hello");
+    assert.equal(dm.isGroup, false);
+
+    const group = parseTelegramUpdate(
+      {
+        update_id: 2,
+        message: {
+          message_id: 10,
+          from: { id: 2, is_bot: false },
+          chat: { id: -100, type: "supergroup" },
+          text: "@MyBot help",
+        },
+      },
+      { botUsername: "MyBot" },
+    );
+    assert.equal(group.text, "help");
+    assert.equal(group.isGroup, true);
+    assert.equal(mentionsTelegramBot({ text: "@MyBot" }, "@MyBot", "MyBot"), true);
+    assert.deepEqual(segmentTelegramText("abcd", 2), ["ab", "cd"]);
   });
 });

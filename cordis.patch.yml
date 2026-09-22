@@ -27,6 +27,14 @@
             enabled: false
             botToken: ""
             appToken: ""
+          discord:
+            enabled: false
+            botToken: ""
+            applicationId: ""
+          telegram:
+            enabled: false
+            botToken: ""
+            botUsername: ""
         agent:
           cwd: ""
           provider: ""

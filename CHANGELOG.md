@@ -4,6 +4,16 @@
 
 - WeCom asks for a text message when a voice clip has no transcript.
 
+## 0.3.2
+
+- Add **Telegram** long-poll adapter (`DSH_IM_TELEGRAM=1` + `TELEGRAM_BOT_TOKEN`; optional `TELEGRAM_BOT_USERNAME` for group @).
+- Workspace `~/.dsh/im-workspace/telegram`.
+
+## 0.3.1
+
+- Add **Discord Gateway** adapter (`DSH_IM_DISCORD=1` + `DISCORD_BOT_TOKEN`; optional `DISCORD_APPLICATION_ID`).
+- Guild messages require bot mention; DMs accepted. Workspace `~/.dsh/im-workspace/discord`.
+
 ## 0.3.0
 
 - Add **Slack Socket Mode** adapter (`DSH_IM_SLACK=1` + `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN`).

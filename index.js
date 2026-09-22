@@ -29,14 +29,15 @@ export function apply(ctx, raw = {}) {
     name: "tool:im_status",
     order: 126,
     text:
-      "dsh-wsl-im bridges Feishu / WeCom (aibot WS) / DingTalk Stream / QQ Gateway / Slack Socket Mode " +
-      "directly into dsh agents. Wire behavior follows vendor docs. " +
+      "dsh-wsl-im bridges Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram " +
+      "directly into dsh agents over outbound long connections or long-poll. " +
       "Use im_status to see which adapters are up. Never paste bot secrets into chat.",
   });
 
   ctx.tools.register({
     name: "im_status",
-    description: "Show dsh-wsl-im adapter status (Feishu / WeCom / DingTalk / QQ / Slack / mock).",
+    description:
+      "Show dsh-wsl-im adapter status (Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram / mock).",
     parameters: { type: "object", additionalProperties: false, properties: {} },
     output: {
       schema: { type: "object", additionalProperties: true },

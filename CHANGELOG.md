@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+
+- Unify outbound HTTP with WebSocket: DingTalk / Slack / QQ / Discord / Telegram API
+  calls use `proxiedFetch` (honors `HTTPS_PROXY` / `HTTP_PROXY` via `https-proxy-agent`).
+
 ## 0.3.3
 
 - Fix session format v4: user message `source.kind` is now `plugin:dsh-wsl-im` (retired bare `plugin`).

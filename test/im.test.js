@@ -25,6 +25,7 @@ import {
   segmentTelegramText,
   mentionsTelegramBot,
 } from "../lib/adapters/telegram.js";
+import { proxiedFetch, proxyLabel, resolveProxyUrl } from "../lib/proxy.js";
 
 describe("resolveConfig", () => {
   it("maps vendor env names", () => {
@@ -363,5 +364,17 @@ describe("telegram", () => {
     assert.equal(group.isGroup, true);
     assert.equal(mentionsTelegramBot({ text: "@MyBot" }, "@MyBot", "MyBot"), true);
     assert.deepEqual(segmentTelegramText("abcd", 2), ["ab", "cd"]);
+  });
+});
+
+describe("proxiedFetch", () => {
+  it("labels proxy from env", () => {
+    assert.equal(proxyLabel({}), "direct");
+    assert.equal(proxyLabel({ HTTPS_PROXY: "http://127.0.0.1:9" }), "via-proxy");
+    assert.equal(resolveProxyUrl({ http_proxy: "http://127.0.0.1:9" }), "http://127.0.0.1:9");
+  });
+
+  it("is exported as a function", () => {
+    assert.equal(typeof proxiedFetch, "function");
   });
 });

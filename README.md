@@ -12,7 +12,7 @@ Messages go: `IM → this plugin → ctx.agents → reply`.
 
 | Field | Value |
 |-------|-------|
-| **Plugin** | `dsh-wsl-im` **0.3.3** |
+| **Plugin** | `dsh-wsl-im` **0.3.4** |
 | **Minimum dsh** | ≥ **0.1.2** |
 | **Latest verified** | See [dsh-wsl-kit Compatibility](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) |
 | **Kit set** | not in `install.sh` (optional) |

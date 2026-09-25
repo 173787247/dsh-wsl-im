@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+- Fix session format v4: user message `source.kind` is now `plugin:dsh-wsl-im` (retired bare `plugin`).
+
 ## Unreleased
 
 - WeCom asks for a text message when a voice clip has no transcript.

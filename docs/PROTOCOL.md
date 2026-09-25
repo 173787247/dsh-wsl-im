@@ -38,7 +38,7 @@ Same contract as WeCom: adapters pass `images` / `files` into `onMessage`. The b
 | Discord | `attachments[].url` (CDN allowlist) | same | save + ask text | save only |
 | Telegram | `photo` / `document` via `getFile` | same | `voice` / `audio` → save + ask text | `video` / `video_note` save only |
 
-Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs.com` / `*.alicdn.com`, `*.qq.com` / `*.ugcimg.cn`), Slack (`*.slack.com`), Discord CDN, or Telegram (`api.telegram.org`) with bot auth. If `HTTPS_PROXY` is set, token / Stream / Gateway / Socket Mode / long-poll / media downloads use that agent — this WSL has no direct egress to those hosts.
+Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs.com` / `*.alicdn.com`, `*.qq.com` / `*.ugcimg.cn`), Slack (`*.slack.com`), Discord CDN, or Telegram (`api.telegram.org`) with bot auth. If `HTTPS_PROXY` / `HTTP_PROXY` is set, **WS** (via `resolveWsProxyAgent`) and **HTTP APIs** (DingTalk / Slack / QQ / Discord / Telegram via `proxiedFetch`) plus media downloads all use that agent — this WSL has no direct egress to those hosts. Feishu HTTP goes through the Lark SDK (`defaultHttpInstance.defaults.proxy = false` + env proxy where applicable).
 
 ## dsh side
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.5
+
+- QQ / DingTalk / Telegram outbound: flatten Markdown tables, headings, and emphasis
+  into plain text (`lib/im-plain.js`) so IM clients without GFM stay readable.
+
 ## 0.3.4
 
 - Unify outbound HTTP with WebSocket: DingTalk / Slack / QQ / Discord / Telegram API

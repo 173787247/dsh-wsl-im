@@ -25,6 +25,7 @@ import {
   segmentTelegramText,
   mentionsTelegramBot,
 } from "../lib/adapters/telegram.js";
+import { formatImOutbound, toImPlainText } from "../lib/im-plain.js";
 import { proxiedFetch, proxyLabel, resolveProxyUrl } from "../lib/proxy.js";
 
 describe("resolveConfig", () => {
@@ -376,5 +377,36 @@ describe("proxiedFetch", () => {
 
   it("is exported as a function", () => {
     assert.equal(typeof proxiedFetch, "function");
+  });
+});
+
+describe("toImPlainText", () => {
+  it("flattens markdown tables for QQ", () => {
+    const md = [
+      "| 项 | 状态 | 说明 |",
+      "|---|---|---|",
+      "| CLI | ✅ | getnote v1.5.10 |",
+      "| Skill | ❌ | 未安装 |",
+      "",
+      "## 下一步",
+      "",
+      "1. **安装** Skill",
+      "2. 接 `MCP`",
+    ].join("\n");
+    const plain = toImPlainText(md);
+    assert.equal(plain.includes("|---|"), false);
+    assert.equal(plain.includes("|"), false);
+    assert.equal(plain.includes("**"), false);
+    assert.match(plain, /CLI：✅/);
+    assert.match(plain, /Skill：❌/);
+    assert.match(plain, /getnote v1\.5\.10/);
+    assert.match(plain, /下一步/);
+    assert.match(plain, /安装 Skill/);
+  });
+
+  it("leaves slack markdown alone via formatImOutbound", () => {
+    const md = "| a | b |\n|---|---|\n| 1 | 2 |";
+    assert.equal(formatImOutbound(md, { platform: "slack" }), md);
+    assert.notEqual(formatImOutbound(md, { platform: "qq" }), md);
   });
 });

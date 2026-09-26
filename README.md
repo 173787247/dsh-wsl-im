@@ -12,7 +12,7 @@ Messages go: `IM → this plugin → ctx.agents → reply`.
 
 | Field | Value |
 |-------|-------|
-| **Plugin** | `dsh-wsl-im` **0.3.5** |
+| **Plugin** | `dsh-wsl-im` **0.3.7** |
 | **Minimum dsh** | ≥ **0.1.2** |
 | **Latest verified** | See [dsh-wsl-kit Compatibility](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) |
 | **Kit set** | not in `install.sh` (optional) |
@@ -30,7 +30,7 @@ flowchart TB
   agents --> reply["reply text back to that chat"]
 ```
 
-Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.3.2** (optional, not in install.sh).
+Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram,mattermost}`, registered on plugin start. One session per chat, not one session for the whole platform. Suite diagram: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.3.7** (optional, not in install.sh).
 
 
 ## Adapters
@@ -44,9 +44,10 @@ Each IM gets `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegr
 | `slack` | Socket Mode | `SLACK_BOT_TOKEN` (`xoxb-`) / `SLACK_APP_TOKEN` (`xapp-`) |
 | `discord` | Gateway WSS | `DISCORD_BOT_TOKEN` (+ optional `DISCORD_APPLICATION_ID`) |
 | `telegram` | Long-poll `getUpdates` | `TELEGRAM_BOT_TOKEN` (+ optional `TELEGRAM_BOT_USERNAME`) |
+| `mattermost` | Outgoing Webhook + Bot REST | `MATTERMOST_URL` / `MATTERMOST_TOKEN` (+ optional webhook path/port) |
 | `mock` | Local HTTP | `DSH_IM_MOCK=1` → `POST http://127.0.0.1:18999/mock` |
 
-Enable with `DSH_IM_FEISHU=1` / `DSH_IM_SLACK=1` / `DSH_IM_DISCORD=1` / `DSH_IM_TELEGRAM=1` (etc.) or `adapters.*.enabled: true` in patch config.
+Enable with `DSH_IM_FEISHU=1` / `DSH_IM_SLACK=1` / `DSH_IM_DISCORD=1` / `DSH_IM_TELEGRAM=1` / `DSH_IM_MATTERMOST=1` (etc.) or `adapters.*.enabled: true` in patch config.
 
 ### Feishu peer dependency
 

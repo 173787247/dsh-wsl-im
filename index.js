@@ -29,15 +29,15 @@ export function apply(ctx, raw = {}) {
     name: "tool:im_status",
     order: 126,
     text:
-      "dsh-wsl-im bridges Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram " +
-      "directly into dsh agents over outbound long connections or long-poll. " +
+      "dsh-wsl-im bridges Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram / Mattermost " +
+      "directly into dsh agents over outbound long connections, long-poll, or webhook. " +
       "Use im_status to see which adapters are up. Never paste bot secrets into chat.",
   });
 
   ctx.tools.register({
     name: "im_status",
     description:
-      "Show dsh-wsl-im adapter status (Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram / mock).",
+      "Show dsh-wsl-im adapter status (Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram / Mattermost / mock).",
     parameters: { type: "object", additionalProperties: false, properties: {} },
     output: {
       schema: { type: "object", additionalProperties: true },
@@ -100,5 +100,13 @@ function formatStatus(v) {
   const lines = (v.adapters || []).map(
     (a) => `- ${a.name}: ${a.state}${a.detail ? ` (${a.detail})` : ""}`,
   );
-  return [`im_status OK — chats=${v.chats ?? 0}`, ...lines].join("\n");
+  const allow =
+    v.allowlistOpen === true
+      ? "allowlistOpen=YES (set allowedUserIds!)"
+      : "allowlistOpen=no";
+  const asr = v.voiceAsr?.enabled === false ? "voiceAsr=off" : "voiceAsr=on";
+  return [
+    `im_status OK — chats=${v.chats ?? 0} ${allow} requireAllowlist=${v.requireAllowlist ? "yes" : "no"} ${asr}`,
+    ...lines,
+  ].join("\n");
 }

@@ -19,7 +19,7 @@ flowchart TB
   agents --> reply["回复回到该聊天"]
 ```
 
-工作区是 `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram}`，插件启动时登记。一个聊天一条会话，不是整个平台共用一条。总图见 [dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.3.2**（可选，不在 install.sh）。
+工作区是 `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram,mattermost}`，插件启动时登记。一个聊天一条会话，不是整个平台共用一条。总图见 [dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.3.7**（可选，不在 install.sh）。
 
 
 
@@ -34,6 +34,7 @@ flowchart TB
 | Slack | Socket Mode | `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN` + `DSH_IM_SLACK=1` |
 | Discord | Gateway WSS | `DISCORD_BOT_TOKEN` + `DSH_IM_DISCORD=1`（可选 `DISCORD_APPLICATION_ID`） |
 | Telegram | `getUpdates` 长轮询 | `TELEGRAM_BOT_TOKEN` + `DSH_IM_TELEGRAM=1`（群 @ 建议设 `TELEGRAM_BOT_USERNAME`） |
+| Mattermost | Outgoing Webhook + Bot REST | `MATTERMOST_URL` / `MATTERMOST_TOKEN` + `DSH_IM_MATTERMOST=1` |
 | mock | 本机 HTTP | `DSH_IM_MOCK=1` |
 
 飞书还需在 profile 里安装 `@larksuiteoapi/node-sdk`。
@@ -44,7 +45,7 @@ Discord 需开 Message Content Intent；频道消息要 @ 机器人。Telegram �
 
 入站图片 / 文件（含 PDF）/ 语音 / 视频已与企微对齐：图片进视觉，PDF 用 `pdftotext`，语音只用平台转写（QQ `asr_refer_text`；多数渠道没有转写就落盘并请改发文字），视频只落盘、不抽帧。群消息需 @ 机器人（Slack 为 `app_mention`）。本机 WSL 直连这几家会超时，长连接和下载在设置了 `HTTPS_PROXY` 时走同一条代理。
 
-每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`、`slack`、`discord`、`telegram`。插件启动时会登记进 dsh 工作区列表，侧边栏显示为飞书、企微、钉钉、QQ、Slack、Discord、Telegram，不用手动添加。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`。
+每个 IM 单独一个工作区：`~/.dsh/im-workspace/feishu`、`wecom`、`dingtalk`、`qq`、`slack`、`discord`、`telegram`、`mattermost`。插件启动时会登记进 dsh 工作区列表，侧边栏显示为飞书、企微、钉钉、QQ、Slack、Discord、Telegram、Mattermost，不用手动添加。同一工作区里仍是一条聊天一个会话。旧会话留在上一级 `im-workspace`。
 
 ## 安装
 
@@ -61,7 +62,7 @@ dsh plugin --profile web add github:173787247/dsh-wsl-im
 
 | 字段 | 值 |
 |------|----|
-| **插件** | `dsh-wsl-im` **0.3.5** |
+| **插件** | `dsh-wsl-im` **0.3.7** |
 | **最低 dsh** | ≥ **0.1.2**（Web UI 一次性 `?token=`，Windows 中继 `:3081`） |
 | **最新验证** | 以 [dsh-wsl-kit 兼容性](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) 为准（当前 **`0.1.7-alpha.2`**）— 套件唯一真源 |
 | **套件档位** | 可选（默认不在 `install.sh` / `KIT_SET=daily`） |

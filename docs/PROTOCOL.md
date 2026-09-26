@@ -11,6 +11,7 @@ Wire behavior follows each vendor's documents.
 | Slack | Socket Mode WSS | `lib/adapters/slack.js` (`apps.connections.open` → Events API envelopes → `chat.postMessage`) |
 | Discord | Gateway WSS v10 | `lib/adapters/discord.js` (Identify/Heartbeat → `MESSAGE_CREATE` → REST `channels/{id}/messages`) |
 | Telegram | Bot API long-poll | `lib/adapters/telegram.js` (`getUpdates` → `sendMessage`; no webhook) |
+| Mattermost | Outgoing Webhook + Bot REST | `lib/adapters/mattermost.js` (HTTP listen → `POST /api/v4/posts`) |
 
 ## Env names
 
@@ -23,6 +24,7 @@ Wire behavior follows each vendor's documents.
 | Slack | `SLACK_BOT_TOKEN` (`xoxb-`) / `SLACK_APP_TOKEN` (`xapp-`) + `DSH_IM_SLACK=1` |
 | Discord | `DISCORD_BOT_TOKEN` + `DSH_IM_DISCORD=1` (+ optional `DISCORD_APPLICATION_ID`) |
 | Telegram | `TELEGRAM_BOT_TOKEN` + `DSH_IM_TELEGRAM=1` (+ optional `TELEGRAM_BOT_USERNAME`) |
+| Mattermost | `MATTERMOST_URL` / `MATTERMOST_TOKEN` + `DSH_IM_MATTERMOST=1` (+ optional `MATTERMOST_WEBHOOK_PATH`, `MATTERMOST_WEBHOOK_PORT`, `MATTERMOST_WEBHOOK_TOKEN`) |
 | Mock | `DSH_IM_MOCK=1` |
 
 ## Inbound media
@@ -37,8 +39,9 @@ Same contract as WeCom: adapters pass `images` / `files` into `onMessage`. The b
 | Slack | `files[].url_private` (+ bot token) | same | save + ask text (no ASR) | save only |
 | Discord | `attachments[].url` (CDN allowlist) | same | save + ask text | save only |
 | Telegram | `photo` / `document` via `getFile` | same | `voice` / `audio` → save + ask text | `video` / `video_note` save only |
+| Mattermost | (text webhook only in v0.3.7) | — | — | — |
 
-Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs.com` / `*.alicdn.com`, `*.qq.com` / `*.ugcimg.cn`), Slack (`*.slack.com`), Discord CDN, or Telegram (`api.telegram.org`) with bot auth. If `HTTPS_PROXY` / `HTTP_PROXY` is set, **WS** (via `resolveWsProxyAgent`) and **HTTP APIs** (DingTalk / Slack / QQ / Discord / Telegram via `proxiedFetch`) plus media downloads all use that agent — this WSL has no direct egress to those hosts. Feishu HTTP goes through the Lark SDK (`defaultHttpInstance.defaults.proxy = false` + env proxy where applicable).
+Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs.com` / `*.alicdn.com`, `*.qq.com` / `*.ugcimg.cn`), Slack (`*.slack.com`), Discord CDN, or Telegram (`api.telegram.org`) with bot auth. If `HTTPS_PROXY` / `HTTP_PROXY` is set, **WS** (via `resolveWsProxyAgent`) and **HTTP APIs** (DingTalk / Slack / QQ / Discord / Telegram / Mattermost via `proxiedFetch`) plus media downloads all use that agent — this WSL has no direct egress to those hosts. Feishu HTTP goes through the Lark SDK (`defaultHttpInstance.defaults.proxy = false` + env proxy where applicable).
 
 ## dsh side
 
@@ -46,7 +49,14 @@ Downloads stay on domestic hosts (Feishu OpenAPI, `*.dingtalk.com` / `*.aliyuncs
 IM adapter → Bridge.handleMessage → ctx.agents.create / followup → session/event → reply()
 ```
 
-Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/WeCom/DingTalk/QQ/Slack/Discord/Telegram stay one package.
+Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/WeCom/DingTalk/QQ/Slack/Discord/Telegram/Mattermost stay one package.
+
+## Optional vecmem crumbs (CALL_CHAINS)
+
+After a successful IM reply you can store a short summary in [dsh-wsl-vecmem](https://github.com/173787247/dsh-wsl-vecmem):
+
+1. **Manual (recommended):** ask the agent to call `vecmem_add` with `workspace=im:qq` (or `im:feishu`, `im:mattermost`, …) and a short text crumb.
+2. **Auto (optional):** set `agent.vecmemOnReply: true` or `DSH_IM_VECMEM_ON_REPLY=1`. After a successful reply the bridge best-effort invokes `vecmem_add` with `workspace=im:{platform}` and the first 500 chars of the answer. If the tool or invoke API is missing, it logs and skips (default is off).
 
 ## Slack smoke (optional)
 
@@ -71,13 +81,29 @@ Same shape as community `dsh-im-hub`, kept inside this WSL-kit plugin so Feishu/
 2. Env: `DSH_IM_TELEGRAM=1`, `TELEGRAM_BOT_TOKEN=…`, `TELEGRAM_BOT_USERNAME=YourBot`.
 3. Restart web; private chat works; groups need @bot.
 
-Agent cwd is one directory per platform under `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram}` (override the parent with `DSH_IM_AGENT_CWD`). Plugin startup calls `ctx.workspaceRegistry.create` so those folders appear in the desktop sidebar. Each chat is still its own session.
+## Mattermost smoke (optional)
+
+1. Create a Bot account; copy access token. Create an **Outgoing Webhook** pointing at `http://<host>:19000/mattermost` (or your `MATTERMOST_WEBHOOK_PATH` / port). Invite the bot to the channel.
+2. Env:
+   ```
+   DSH_IM_MATTERMOST=1
+   MATTERMOST_URL=https://mm.example.com
+   MATTERMOST_TOKEN=bot-access-token
+   # MATTERMOST_WEBHOOK_PATH=/mattermost
+   # MATTERMOST_WEBHOOK_PORT=19000
+   # MATTERMOST_WEBHOOK_TOKEN=outgoing-webhook-token
+   ```
+3. Ensure Mattermost can reach the webhook listener (WSL port publish / reverse proxy / tunnel — this is the one adapter that needs inbound HTTP).
+4. Restart web; post a message that matches the outgoing webhook trigger.
+
+Agent cwd is one directory per platform under `~/.dsh/im-workspace/{feishu,wecom,dingtalk,qq,slack,discord,telegram,mattermost}` (override the parent with `DSH_IM_AGENT_CWD`). Plugin startup calls `ctx.workspaceRegistry.create` so those folders appear in the desktop sidebar. Each chat is still its own session.
 
 ## WSL notes
 
-All adapters are **outbound** long connections or long-poll — no public callback URL / inbound port map on Windows.
+Most adapters are **outbound** long connections or long-poll — no public callback URL / inbound port map on Windows. **Mattermost** is the exception: Outgoing Webhooks POST into this plugin's HTTP listener.
 
 1. Credentials must be in the **WSL** process env (or sourced before `restart-dsh-web.sh`), not only Windows.
 2. Windows VPN/proxy may not apply inside WSL; fix WSL egress if subscribe/connect fails.
 3. QQ IP allowlists must use the **WSL egress IP** (often ≠ Windows host).
 4. WeCom: one Bot = one live long connection (a new connect kicks the old).
+5. Mattermost: publish `MATTERMOST_WEBHOOK_PORT` so the Mattermost server can reach WSL.

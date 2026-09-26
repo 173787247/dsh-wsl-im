@@ -25,6 +25,11 @@ import {
   segmentTelegramText,
   mentionsTelegramBot,
 } from "../lib/adapters/telegram.js";
+import {
+  parseMattermostWebhook,
+  stripMattermostTrigger,
+  segmentMattermostText,
+} from "../lib/adapters/mattermost.js";
 import { formatImOutbound, toImPlainText } from "../lib/im-plain.js";
 import { proxiedFetch, proxyLabel, resolveProxyUrl } from "../lib/proxy.js";
 
@@ -48,6 +53,10 @@ describe("resolveConfig", () => {
         DSH_IM_TELEGRAM: "1",
         TELEGRAM_BOT_TOKEN: "tg-token",
         TELEGRAM_BOT_USERNAME: "MyBot",
+        DSH_IM_MATTERMOST: "1",
+        MATTERMOST_URL: "https://mm.example.com",
+        MATTERMOST_TOKEN: "mm-token",
+        MATTERMOST_WEBHOOK_PATH: "/hooks/mm",
       },
     );
     assert.equal(cfg.adapters.feishu.enabled, true);
@@ -59,6 +68,11 @@ describe("resolveConfig", () => {
     assert.equal(cfg.adapters.discord.enabled, true);
     assert.equal(cfg.adapters.discord.botToken, "discord-token");
     assert.equal(cfg.adapters.telegram.botUsername, "MyBot");
+    assert.equal(cfg.adapters.mattermost.enabled, true);
+    assert.equal(cfg.adapters.mattermost.baseUrl, "https://mm.example.com");
+    assert.equal(cfg.adapters.mattermost.botToken, "mm-token");
+    assert.equal(cfg.adapters.mattermost.webhookPath, "/hooks/mm");
+    assert.equal(cfg.agent.vecmemOnReply, false);
   });
 });
 
@@ -95,8 +109,8 @@ describe("resolveImWorkspace", () => {
     assert.equal(calls.length, IM_WORKSPACE_PRESETS.length);
     assert.equal(calls[0][0], join(base, "feishu"));
     assert.equal(calls[0][1], "飞书");
-    assert.equal(calls.at(-1)[0], join(base, "telegram"));
-    assert.equal(calls.at(-1)[1], "Telegram");
+    assert.equal(calls.at(-1)[0], join(base, "mattermost"));
+    assert.equal(calls.at(-1)[1], "Mattermost");
   });
 });
 
@@ -368,6 +382,36 @@ describe("telegram", () => {
   });
 });
 
+describe("mattermost", () => {
+  it("parses form-urlencoded outgoing webhook", () => {
+    const body =
+      "token=abc&team_id=t1&channel_id=c1&channel_name=town&user_id=u1&user_name=bob&post_id=p1&text=hello+world&trigger_word=hello";
+    const p = parseMattermostWebhook(body, { contentType: "application/x-www-form-urlencoded" });
+    assert.equal(p.skip, undefined);
+    assert.equal(p.chatId, "c1");
+    assert.equal(p.userId, "u1");
+    assert.equal(p.text, "hello world");
+    assert.equal(p.triggerWord, "hello");
+    assert.equal(stripMattermostTrigger(p.text, p.triggerWord), "world");
+  });
+  it("parses JSON webhook and segments long text", () => {
+    const p = parseMattermostWebhook(
+      JSON.stringify({
+        channel_id: "ch",
+        user_id: "u",
+        post_id: "p",
+        text: "hi",
+      }),
+      { contentType: "application/json" },
+    );
+    assert.equal(p.text, "hi");
+    assert.deepEqual(segmentMattermostText("abcd", 2), ["ab", "cd"]);
+  });
+  it("skips empty body", () => {
+    assert.equal(parseMattermostWebhook({ channel_id: "c", user_id: "u", text: "" }).skip, "empty-body");
+  });
+});
+
 describe("proxiedFetch", () => {
   it("labels proxy from env", () => {
     assert.equal(proxyLabel({}), "direct");
@@ -408,5 +452,22 @@ describe("toImPlainText", () => {
     const md = "| a | b |\n|---|---|\n| 1 | 2 |";
     assert.equal(formatImOutbound(md, { platform: "slack" }), md);
     assert.notEqual(formatImOutbound(md, { platform: "qq" }), md);
+  });
+});
+
+describe("local-asr helpers", () => {
+  it("detects audio-like names", async () => {
+    const { isProbablyAudioName } = await import("../lib/local-asr.js");
+    assert.equal(isProbablyAudioName("voice.wav"), true);
+    assert.equal(isProbablyAudioName("wecom-voice.silk"), true);
+    assert.equal(isProbablyAudioName("notes.pdf"), false);
+  });
+});
+
+describe("allowlist config", () => {
+  it("maps requireAllowlist from env", () => {
+    const c = resolveConfig({}, { DSH_IM_REQUIRE_ALLOWLIST: "1" });
+    assert.equal(c.requireAllowlist, true);
+    assert.equal(c.voiceAsr.enabled, true);
   });
 });

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.7
+
+- Add **Mattermost** adapter: Outgoing Webhook listener + Bot REST `POST /api/v4/posts`
+  (`DSH_IM_MATTERMOST=1`, `MATTERMOST_URL`, `MATTERMOST_TOKEN`, optional webhook path/port/token).
+- Workspace `~/.dsh/im-workspace/mattermost`; plain-text outbound like QQ/Telegram.
+- Optional `agent.vecmemOnReply` / `DSH_IM_VECMEM_ON_REPLY=1`: after a successful reply, best-effort
+  `vecmem_add` with `workspace=im:{platform}` (first 500 chars). Documented in PROTOCOL.
+
+## 0.3.6
+
+- Security: startup warning when `allowedUserIds` is empty; `im_status.allowlistOpen`.
+  Set `requireAllowlist` / `DSH_IM_REQUIRE_ALLOWLIST=1` to refuse starting open adapters.
+- Voice: optional local Whisper ASR (`lib/local-asr.js`, `voiceAsr`) when platform ASR is empty.
+
 ## 0.3.5
 
 - QQ / DingTalk / Telegram outbound: flatten Markdown tables, headings, and emphasis

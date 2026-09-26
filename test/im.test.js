@@ -470,4 +470,13 @@ describe("allowlist config", () => {
     assert.equal(c.requireAllowlist, true);
     assert.equal(c.voiceAsr.enabled, true);
   });
+
+  it("maps allowedUserIds from CSV env", () => {
+    const c = resolveConfig(
+      {},
+      { DSH_IM_QQ_ALLOWED_USER_IDS: "u1, u2 ;u3", DSH_IM_TELEGRAM_ALLOWED_USER_IDS: "6247102576" },
+    );
+    assert.deepEqual(c.adapters.qq.allowedUserIds, ["u1", "u2", "u3"]);
+    assert.deepEqual(c.adapters.telegram.allowedUserIds, ["6247102576"]);
+  });
 });

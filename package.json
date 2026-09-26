@@ -1,6 +1,6 @@
 {
   "name": "dsh-wsl-im",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "DeepSeek Harness IM bridge for WSL: Feishu / WeCom / DingTalk / QQ / Slack / Discord / Telegram / Mattermost into ctx.agents (plus im_status tool).",
   "license": "MIT",
   "repository": {

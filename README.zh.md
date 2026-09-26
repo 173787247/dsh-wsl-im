@@ -62,7 +62,7 @@ dsh plugin --profile web add github:173787247/dsh-wsl-im
 
 | 字段 | 值 |
 |------|----|
-| **插件** | `dsh-wsl-im` **0.3.7** |
+| **插件** | `dsh-wsl-im` **0.3.8** |
 | **最低 dsh** | ≥ **0.1.2**（Web UI 一次性 `?token=`，Windows 中继 `:3081`） |
 | **最新验证** | 以 [dsh-wsl-kit 兼容性](https://github.com/173787247/dsh-wsl-kit#compatibility-2026-09) 为准（当前 **`0.1.7-alpha.2`**）— 套件唯一真源 |
 | **套件档位** | 可选（默认不在 `install.sh` / `KIT_SET=daily`） |

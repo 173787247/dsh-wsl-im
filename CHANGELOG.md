@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8
+
+- Allowlists from env: `DSH_IM_<PLATFORM>_ALLOWED_USER_IDS` (comma/space-separated),
+  e.g. `DSH_IM_QQ_ALLOWED_USER_IDS=…`. Cordis `allowedUserIds` still wins when non-empty.
+
 ## 0.3.7
 
 - Add **Mattermost** adapter: Outgoing Webhook listener + Bot REST `POST /api/v4/posts`

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ENV="${HOME}/.dsh/dsh-wsl-im.env"
-SRC="/mnt/c/Users/rchua/Desktop/AIFullStackDevelopment/oryxos/.env"
+SRC="${ORYXOS_ENV:-$HOME/GO/oryxos/.env}"
 ts=$(date +%Y%m%d%H%M%S)
 cp -a "$ENV" "${ENV}.bak.${ts}"
 
